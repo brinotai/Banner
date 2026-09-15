@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banner - Gelatinas personalizadas</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    background: #111;
+  }
+
+  /* Contenedor del banner: mantiene la relación de aspecto 16:9 del gif original (1280x720) */
+  .banner {
+    position: relative;
+    width: 100%;
+    max-width: 1280px;
+    aspect-ratio: 16 / 9;
+    margin: 0 auto;
+    overflow: hidden;
+    background: #d9a066; /* color de respaldo mientras carga */
+  }
+
+  .banner video,
+  .banner img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+</style>
+</head>
+<body>
+
+  <div class="banner" id="bannerWrap">
+    <!--
+      Video SIN atributo "loop": la animación se reproduce UNA sola vez y
+      se queda congelada en el último frame (el texto completo), en vez
+      de repetirse en bucle infinito como hacía el GIF original.
+
+      "muted" + "playsinline" son necesarios para que el autoplay
+      funcione en navegadores de escritorio y móviles (iOS/Android).
+
+      "poster" muestra el último frame por si el navegador tarda en
+      cargar el video, y sirve también como respaldo si el usuario
+      tiene el autoplay bloqueado.
+    -->
+    <video
+      id="bannerVideo"
+      autoplay
+      muted
+      playsinline
+      preload="auto"
+      poster="assets/poster.jpg"
+      aria-label="Gelatinas personalizadas, postres y más. El toque dulce de tu evento.">
+      <source src="assets/banner.webm" type="video/webm">
+      <source src="assets/banner.mp4" type="video/mp4">
+      <!-- Respaldo si el navegador no soporta <video> -->
+      <img src="assets/poster.jpg" alt="Gelatinas personalizadas, postres y más">
+    </video>
+  </div>
+
+  <script>
+    // Respaldo extra: si el navegador bloquea el autoplay (algunos
+    // móviles con datos ahorrados, por ejemplo), mostramos directamente
+    // la imagen final estática para que el banner nunca se quede vacío.
+    const video = document.getElementById('bannerVideo');
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        video.style.display = 'none';
+        const img = document.createElement('img');
+        img.src = 'assets/poster.jpg';
+        img.alt = video.getAttribute('aria-label');
+        video.parentElement.appendChild(img);
+      });
+    }
+  </script>
+
+</body>
+</html>
